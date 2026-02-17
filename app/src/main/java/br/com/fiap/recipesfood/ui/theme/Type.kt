@@ -1,4 +1,4 @@
-package br.com.fiap.recipiesfood.ui.theme
+package br.com.fiap.recipesfood.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -6,14 +6,14 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import br.com.fiap.recipiesfood.R
+import br.com.fiap.recipesfood.R
 
 // FONTE POPPINS
 val poppinsFamily = FontFamily(
     Font(R.font.poppins_regular, FontWeight.Normal),
     Font(R.font.poppins_bold, FontWeight.Bold),
     Font(R.font.poppins_semibold, FontWeight.SemiBold),
-    )
+)
 
 // Set of Material typography styles to start with
 val Typography = Typography(
@@ -72,5 +72,19 @@ val Typography = Typography(
         fontSize = 64.sp,
         lineHeight = 68.sp,
         letterSpacing = 0.5.sp
-    )
+    ),
+    displayMedium = TextStyle(
+        fontFamily = poppinsFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 64.sp,
+        lineHeight = 68.sp,
+        letterSpacing = 0.5.sp
+    ),
+    displaySmall = TextStyle(
+        fontFamily = poppinsFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 100.sp,
+        letterSpacing = 0.5.sp
+    ),
 )

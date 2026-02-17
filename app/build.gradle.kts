@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "br.com.fiap.recipiesfood"
+    namespace = "br.com.fiap.recipesfood"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -12,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "br.com.fiap.recipiesfood"
+        applicationId = "br.com.fiap.recipesfood"
         minSdk = 28
         targetSdk = 36
         versionCode = 1
@@ -55,4 +55,7 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    //Mais Ícones
+    implementation("androidx.compose.material:material-icons-extended-android:1.7.8")
+
 }

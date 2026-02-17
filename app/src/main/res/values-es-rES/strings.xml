@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Recetas de comida</string>
+    <string name="app_title">Empieza a cocinar</string>
+    <string name="unlimited_recipes">RECETAS PREMIUM ILIMITADAS</string>
+    <string name="button_login">Iniciar sesión</string>
+    <string name="button_signup">Registrar-se</string>
+    <string name="sign_up">Registrar-se</string>
+    <string name="create_account">Crear una nueva cuenta</string>
+    <string name="user_image">Imagen de usuario</string>
+    <string name="camera_icon">Icono de cámara</string>
+    <string name="your_name">Tu nombre</string>
+    <string name="person_icon">Icono de persona</string>
+    <string name="your_email">Tu correo electrónico</string>
+    <string name="mail_icon">Icono de correo</string>
+    <string name="your_password">Tu contraseña</string>
+    <string name="lock_icon">Icono de candado</string>
+    <string name="icon_remove_red_eye">Icono para eliminar ojos rojos</string>
+    <string name="create_new_account">Crear nueva cuenta</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="to_continue">Inicia sesión para continuar</string>
+    <string name="sign_in">INICIAR SESIÓN</string>
+    <string name="your_password_login">Tu contraseña</string>
+    <string name="your_e_mail">Tu correo electrónico</string>
+    <string name="email_icon_login">Icono de correo electrónico</string>
+    <string name="don_t_have_an_account">¿No tienes cuenta?</string>
+    <string name="lock_icon_login">Icono de candado</string>
+</resources>

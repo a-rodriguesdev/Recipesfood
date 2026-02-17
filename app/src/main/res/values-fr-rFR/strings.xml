@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Recettes de cuisine</string>
+    <string name="app_title">Commencer à cuisiner</string>
+    <string name="unlimited_recipes">RECETTES PREMIUM ILLIMITÉES</string>
+    <string name="button_login">Se connecter</string>
+    <string name="button_signup">S\'inscrire</string>
+    <string name="sign_up">S\'inscrire</string>
+    <string name="create_account">Créer un compte</string>
+    <string name="user_image">Image de profil</string>
+    <string name="camera_icon">Icône appareil photo</string>
+    <string name="your_name">Votre nom</string>
+    <string name="person_icon">Icône personne</string>
+    <string name="your_email">Votre adresse e-mail</string>
+    <string name="mail_icon">Icône messagerie</string>
+    <string name="your_password">Votre mot de passe</string>
+    <string name="lock_icon">Verrouiller</string>
+    <string name="icon_remove_red_eye">Icône pour supprimer les yeux rouges</string>
+    <string name="create_new_account">Créer un compte</string>
+    <string name="login">Se connecter</string>
+    <string name="to_continue">Veuillez vous connecter pour continuer</string>
+    <string name="sign_in">SE CONNECTER</string>
+    <string name="your_password_login">Votre mot de passe</string>
+    <string name="your_e_mail">Votre adresse e-mail</string>
+    <string name="email_icon_login">Icône e-mail</string>
+    <string name="don_t_have_an_account">Vous n\'avez pas de compte?</string>
+    <string name="lock_icon_login">Icône de verrouillage</string>
+</resources>
