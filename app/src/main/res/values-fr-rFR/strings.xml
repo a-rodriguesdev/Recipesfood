@@ -24,4 +24,6 @@
     <string name="email_icon_login">Icône e-mail</string>
     <string name="don_t_have_an_account">Vous n\'avez pas de compte?</string>
     <string name="lock_icon_login">Icône de verrouillage</string>
+    <string name="search_by_recipes">Search by recipes</string>
+    <string name="categories">Categories</string>
 </resources>
