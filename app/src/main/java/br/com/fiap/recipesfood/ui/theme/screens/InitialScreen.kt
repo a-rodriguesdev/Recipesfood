@@ -57,9 +57,9 @@ fun InitialScreen(navController: NavController){
                 painter = painterResource(R.drawable.chef),
                 contentDescription = "Imagem de uma mulher cozinhando.",
                 modifier = Modifier
-                    .size(210.dp)
+                    .size(360.dp)
             )
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

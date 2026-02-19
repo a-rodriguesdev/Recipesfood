@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -51,6 +55,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
 import br.com.fiap.recipesfood.R
+import br.com.fiap.recipesfood.components.CategoryItem
+import br.com.fiap.recipesfood.components.RecipeItem
+import br.com.fiap.recipesfood.model.Category
+import br.com.fiap.recipesfood.repository.getAllCategories
+import br.com.fiap.recipesfood.repository.getAllRecipes
 
 @Composable
 fun HomeScreen(navController: NavHostController, email: String?) {
@@ -196,17 +205,26 @@ private fun MyBottomAppBarPreview() {
 
 @Composable
 fun ContentScreen(modifier: Modifier = Modifier) {
+
+    // Variável que vai armazenar a lista de categorias
+
+    val categories = getAllCategories()
+
+    // Variável que vai armazenar a lista de receitas
+
+    val recipes = getAllRecipes()
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 0.dp)
     ) {
         OutlinedTextField(
             value = "",
             onValueChange = {},
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults
                 .colors(
@@ -238,7 +256,7 @@ fun ContentScreen(modifier: Modifier = Modifier) {
         )
         Card(
             modifier = Modifier
-                .padding(bottom = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 4.dp)
                 .fillMaxWidth()
                 .height(116.dp)
         ) {
@@ -251,19 +269,39 @@ fun ContentScreen(modifier: Modifier = Modifier) {
             )
         }
         Text(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 4.dp),
             text = stringResource(R.string.categories),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.primary
         )
-        Spacer(
-            modifier = Modifier
-                .height(116.dp)
-        )
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(categories){category ->
+                CategoryItem(category)
+            }
+        }
         Text(
             text = "Newly added recipes",
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         )
+        LazyColumn(
+            contentPadding = PaddingValues(
+                vertical = 8.dp,
+                horizontal = 16.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(recipes){recipe ->
+                RecipeItem(recipe)
+
+            }
+        }
     }
 }
 
