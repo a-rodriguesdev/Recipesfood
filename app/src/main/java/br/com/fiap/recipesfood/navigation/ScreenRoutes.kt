@@ -11,7 +11,7 @@ sealed class Destination(val route: String){
     }
     object LoginScreen: Destination("login")
 
-    object  CategoryRecipeScreen: Destination("category/{categoryid}"){
+    object  CategoryRecipeScreen: Destination("category/{categoryId}"){
         fun createRoute(categoryId: Int): String {
             return "category/$categoryId"
         }

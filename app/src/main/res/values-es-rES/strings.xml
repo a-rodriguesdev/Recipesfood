@@ -26,4 +26,5 @@
     <string name="lock_icon_login">Icono de candado</string>
     <string name="search_by_recipes">Search by recipes</string>
     <string name="categories">Categories</string>
+    <string name="password_icon">Password icon</string>
 </resources>

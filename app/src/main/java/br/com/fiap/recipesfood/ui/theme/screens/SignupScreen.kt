@@ -1,6 +1,7 @@
 package br.com.fiap.recipesfood.ui.theme.screens
 
 import android.content.res.Configuration
+import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,28 +14,44 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.filled.RemoveRedEye
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.fiap.recipesfood.R
+import br.com.fiap.recipesfood.model.User
+import br.com.fiap.recipesfood.navigation.Destination
+import br.com.fiap.recipesfood.repository.SharedPreferencesUserRepository
+import br.com.fiap.recipesfood.repository.UserRepository
 import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
 
 @Composable
@@ -58,7 +75,7 @@ fun SignupScreen(navController: NavController) {
             TitleComponent()
             Spacer(modifier = Modifier.height(48.dp))
             UserImage()
-            SignupUserForm()
+            SignupUserForm(navController)
         }
     }
 }
@@ -76,7 +93,7 @@ private fun SignupScreenPreview() {
 }
 
 @Composable
-fun TitleComponent(modifier: Modifier = Modifier) {
+fun TitleComponent() {
     Column (
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -109,7 +126,7 @@ private fun TitleComponentPreview() {
 }
 
 @Composable
-fun UserImage(modifier: Modifier = Modifier) {
+fun UserImage() {
     Box(
         modifier = Modifier
             .size(120.dp)
@@ -143,125 +160,287 @@ private fun UserImagePreview() {
 }
 
 @Composable
-fun SignupUserForm(modifier: Modifier = Modifier) {
+fun SignupUserForm(navController: NavController) {
+
+    // Variáveis de estado para controlar
+    // os valores exibidos nos OutlinedTextFields
+    var name by remember {
+        mutableStateOf("")
+    }
+    var email by remember {
+        mutableStateOf("")
+    }
+    var password by remember {
+        mutableStateOf("")
+    }
+
+    // Variáveis de estado para verificar se os dados estão corretos
+    var isNameError by remember { mutableStateOf(false) }
+    var isEmailError by remember { mutableStateOf(false) }
+    var isPasswordError by remember { mutableStateOf(false) }
+
+    // Variável de estado para controlar a exibição da mensagem de erro
+    var showDialogError by remember { mutableStateOf(false) }
+    var showDialogSuccess by remember { mutableStateOf(false) }
+
+
+    // Função para verificar se os dados estão corretos
+    fun validate(): Boolean{
+        isNameError = name.length < 3
+        isEmailError = email.length < 3 || !Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        isPasswordError = password.length < 3
+        return !isNameError && !isEmailError && !isPasswordError
+    }
+
+    // Criar uma instância da classe SharedPreferencesUserRepository
+    val userRepository: UserRepository =
+        SharedPreferencesUserRepository(LocalContext.current)
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(32.dp)
-
     ) {
-        // Caixa de texto para nome do usuário
+        // Caixa de texto your name
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = name,
+            onValueChange = {name = it},
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults
+                .colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                ),
             label = {
                 Text(
                     text = stringResource(R.string.your_name),
                     style = MaterialTheme.typography.labelSmall
                 )
             },
-            shape = RoundedCornerShape(16.dp),
-            colors = OutlinedTextFieldDefaults
-                .colors(
-                    focusedTextColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                ),
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = stringResource(R.string.person_icon),
+                    contentDescription = "",
                     tint = MaterialTheme.colorScheme.tertiary
                 )
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                capitalization = KeyboardCapitalization.Words,
+                imeAction = ImeAction.Next
+            ),
+
+        isError = isNameError,
+        trailingIcon = {
+                if (isNameError){
+                    Icon(
+                        imageVector = Icons.Default.Error,
+                        contentDescription = "Error",
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+        },
+            supportingText = {
+                if (isNameError){
+                    Text (
+                        text = "Name must have at least 3 characters",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.End
+                    )
+                }
             }
         )
-
-        // Caixa de texto para e-mail do usuário
+        // Caixa de texto your e-mail
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = email,
+            onValueChange = {email = it},
             modifier = Modifier
-                .fillMaxWidth(),
-            label = {
-                Text(
-                    text = stringResource(R.string.your_email),
-                    style = MaterialTheme.typography.labelSmall
-                )
-            },
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults
                 .colors(
-                    focusedTextColor = MaterialTheme.colorScheme.primary,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.primary
                 ),
+            label = {
+                Text(
+                    text = stringResource(R.string.your_e_mail),
+                    style = MaterialTheme.typography.labelSmall
+                )
+            },
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Default.Mail,
-                    contentDescription = stringResource(R.string.mail_icon),
+                    imageVector = Icons.Default.Email,
+                    contentDescription = "",
                     tint = MaterialTheme.colorScheme.tertiary
                 )
-            }
-        )
+            },
 
-        // Caixa de texto para senha do usuário
+            isError = isEmailError,
+            trailingIcon = {
+                if (isEmailError){
+                    Icon(
+                        imageVector = Icons.Default.Error,
+                        contentDescription = "Error",
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            supportingText = {
+                if (isEmailError){
+                    Text (
+                        text = "Email must have at least 3 characters",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.End
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            )
+        )
+        // Caixa de texto your password
         OutlinedTextField(
-            value = "",
-            onValueChange = {},
+            value = password,
+            onValueChange = {password = it},
             modifier = Modifier
                 .fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults
+                .colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                ),
             label = {
                 Text(
                     text = stringResource(R.string.your_password),
                     style = MaterialTheme.typography.labelSmall
                 )
             },
-            shape = RoundedCornerShape(16.dp),
-            colors = OutlinedTextFieldDefaults
-                .colors(
-                    focusedTextColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                ),
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Lock,
-                    contentDescription = stringResource(R.string.lock_icon),
+                    contentDescription = stringResource(R.string.password_icon),
                     tint = MaterialTheme.colorScheme.tertiary
                 )
             },
-            trailingIcon =  {
-                Icon(
-                    imageVector = Icons.Default.RemoveRedEye,
-                    contentDescription = stringResource(R.string.icon_remove_red_eye),
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
-            }
-        )
+            isError = isPasswordError,
+            trailingIcon = {
+                if (isPasswordError){
+                    Icon(
+                        imageVector = Icons.Default.Error,
+                        contentDescription = "Error",
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            supportingText = {
+                if (isPasswordError){
+                    Text (
+                        text = "Password must have at least 3 characters",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.End
+                    )
+                }
+            },
 
-        // Botão create new account
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.NumberPassword,
+                imeAction = ImeAction.Done
+            )
+        )
+        // Botão Create account
         Spacer(modifier = Modifier.height(32.dp))
         Button(
-            onClick = {},
+            onClick = {
+                if(validate()){
+                    userRepository
+                    .saveUser(
+                        User(
+                            name = name,
+                            email = email,
+                            password = password
+                        )
+                    )
+                    showDialogSuccess = true
+            }
+                else{
+                    showDialogError = true
+                }
+    },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
             shape = RoundedCornerShape(8.dp)
         ) {
             Text(
-                text = stringResource(R.string.create_new_account),
+                text = stringResource(R.string.create_account),
                 style = MaterialTheme.typography.labelMedium
-
             )
         }
     }
-}
+    // Caixa de diálogo de sucesso
+    if (showDialogSuccess){
+        AlertDialog(
+            onDismissRequest = {showDialogError = false},
+            title = {
+                Text(text = "Success")
+            },
+            text = {
+                Text(text = "Account created successfully")
+            },
+            confirmButton = {
+                    TextButton(
+                        onClick = {
+                            navController.navigate(Destination.LoginScreen.route)
+                        }
+                    ) {
+                        Text(text = "Ok")
+                    }
+            }
+        )
+    }
 
+    // Caixa de diálogo de erro
+    if (showDialogError){
+        AlertDialog(
+            onDismissRequest = {showDialogError = false},
+            title = {
+                Text (text = "Error")
+            },
+            text = {
+            Text (text = "Please fill in all fields correctly")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialogError = false
+                    }
+                ) {
+                    Text(text = "Ok")
+                }
+            }
+        )
+    }
+
+}
 @Preview(
     showBackground = true
 )
 @Composable
 private fun SignupUserFormPreview() {
     RecipesFoodTheme {
-        SignupUserForm()
+        SignupUserForm(rememberNavController())
     }
 }
