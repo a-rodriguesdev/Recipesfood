@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import br.com.fiap.recipesfood.ui.theme.screens.CategoryRecipeScreen
 import br.com.fiap.recipesfood.ui.theme.screens.HomeScreen
 import br.com.fiap.recipesfood.ui.theme.screens.InitialScreen
 import br.com.fiap.recipesfood.ui.theme.screens.LoginScreen
@@ -45,6 +46,18 @@ fun NavigationRoutes(){
         }
         composable(Destination.LoginScreen.route) {
             LoginScreen(navController)
+        }
+        composable(
+
+            route = Destination.CategoryRecipeScreen.route,
+            arguments = listOf(
+                navArgument(name = "categoryId"){
+                    type = NavType.IntType
+                }
+            )
+        ) {
+            val categoryId = it.arguments?.getInt("categoryId")
+            CategoryRecipeScreen(categoryId)
         }
     }
 }

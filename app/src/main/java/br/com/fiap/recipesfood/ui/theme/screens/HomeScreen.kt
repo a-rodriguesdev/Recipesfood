@@ -51,6 +51,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
@@ -58,11 +59,12 @@ import br.com.fiap.recipesfood.R
 import br.com.fiap.recipesfood.components.CategoryItem
 import br.com.fiap.recipesfood.components.RecipeItem
 import br.com.fiap.recipesfood.model.Category
+import br.com.fiap.recipesfood.navigation.Destination
 import br.com.fiap.recipesfood.repository.getAllCategories
 import br.com.fiap.recipesfood.repository.getAllRecipes
 
 @Composable
-fun HomeScreen(navController: NavHostController, email: String?) {
+fun HomeScreen(navController: NavController, email: String?) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -83,7 +85,10 @@ fun HomeScreen(navController: NavHostController, email: String?) {
                 }
             }
         ) { paddingValues ->
-            ContentScreen(modifier = Modifier.padding(paddingValues))
+            ContentScreen(
+                modifier = Modifier.padding(paddingValues),
+                        navController = navController
+            )
             }
         }
     }
@@ -204,7 +209,10 @@ private fun MyBottomAppBarPreview() {
 
 
 @Composable
-fun ContentScreen(modifier: Modifier = Modifier) {
+fun ContentScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController
+) {
 
     // Variável que vai armazenar a lista de categorias
 
@@ -280,7 +288,15 @@ fun ContentScreen(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(categories){category ->
-                CategoryItem(category)
+                CategoryItem(
+                    category = category,
+                    onClick = {
+                    navController.navigate(
+                        route = Destination
+                            .CategoryRecipeScreen
+                            .createRoute(categoryId = category.id)
+                    )
+                })
             }
         }
         Text(
@@ -310,7 +326,7 @@ fun ContentScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun ContentScreenPreview() {
     RecipesFoodTheme{
-        ContentScreen()
+        ContentScreen(navController = rememberNavController())
     }
 }
 

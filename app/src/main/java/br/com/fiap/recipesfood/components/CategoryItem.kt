@@ -2,6 +2,7 @@ package br.com.fiap.recipesfood.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,11 +24,19 @@ import br.com.fiap.recipesfood.model.Category
 import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
 
 @Composable
-fun CategoryItem(category: Category = Category()) {
+fun CategoryItem(
+    category: Category = Category(),
+    onClick: () -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .width(90.dp)
+            .clickable(
+                onClick = {
+                    onClick
+                }
+            )
     ) {
         Card(
             modifier = Modifier
@@ -68,6 +77,6 @@ fun CategoryItem(category: Category = Category()) {
 @Composable
 private fun CategoryItemPreview() {
     RecipesFoodTheme {
-        CategoryItem()
+        CategoryItem(onClick = {})
     }
 }
