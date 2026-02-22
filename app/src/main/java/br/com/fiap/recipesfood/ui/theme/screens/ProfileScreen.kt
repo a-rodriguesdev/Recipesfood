@@ -1,6 +1,5 @@
 package br.com.fiap.recipesfood.ui.theme.screens
 
-import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -35,6 +34,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -50,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -68,7 +69,7 @@ import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
 import br.com.fiap.recipesfood.utils.convertBitmapToByteArray
 
 @Composable
-fun SignupScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController, email: String?) {
 
     val context = LocalContext.current
 
@@ -127,61 +128,47 @@ fun SignupScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            TitleComponent()
+            ProfileTitleComponent()
             Spacer(modifier = Modifier.height(48.dp))
-            UserImage(profileImage, launcher)
-            SignupUserForm(navController, profileImage)
+            ProfileUserImage(profileImage, launcher)
+            ProfileUserForm(navController, profileImage, email)
         }
     }
 }
 
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
-)
+@Preview
 @Composable
-private fun SignupScreenPreview() {
-    RecipesFoodTheme {
-        SignupScreen(rememberNavController())
+private fun ProfileScreenPreview() {
+    RecipesFoodTheme() {
+        ProfileScreen(rememberNavController(), "")
     }
 }
 
 @Composable
-fun TitleComponent() {
-    Column (
+fun ProfileTitleComponent() {
+    Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.sign_up),
+            text = stringResource(R.string.profile),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.titleLarge
         )
 
         Text(
-            text = stringResource(R.string.create_account),
+            text = stringResource(R.string.user_profile_details),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.titleSmall
         )
 
     }
-
 }
 
-@Preview(
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
-)
-@Composable
-private fun TitleComponentPreview() {
-    RecipesFoodTheme {
-        TitleComponent()
-    }
-}
 
 @Composable
-fun UserImage(profileImage: Bitmap?, launcher: ManagedActivityResultLauncher<String, Uri?>) {
+fun ProfileUserImage(
+    profileImage: Bitmap?, launcher: ManagedActivityResultLauncher<String, Uri?>) {
     Box(
         modifier = Modifier
             .size(120.dp)
@@ -192,7 +179,8 @@ fun UserImage(profileImage: Bitmap?, launcher: ManagedActivityResultLauncher<Str
             modifier = Modifier
                 .clip(shape = CircleShape)
                 .size(100.dp)
-                .align(alignment = Alignment.Center)
+                .align(alignment = Alignment.Center),
+            contentScale = ContentScale.Crop
         )
         Icon(
             imageVector = Icons.Default.PhotoCamera,
@@ -209,30 +197,25 @@ fun UserImage(profileImage: Bitmap?, launcher: ManagedActivityResultLauncher<Str
     }
 }
 
-@Preview(
-    showBackground = true
-
-)
-@Composable
-private fun UserImagePreview() {
-    RecipesFoodTheme {
-       // UserImage(profileImage, launcher)
-    }
-}
 
 @Composable
-fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
+fun ProfileUserForm(navController: NavController, profileImage: Bitmap, userEmail: String?) {
+
+    // Criar uma instância da classe SharedPreferencesUserRepository
+    // val userRepository: UserRepository = SharedPreferencesUserRepository(LocalContext.current)
+    val userRepository = RoomUserRepository(LocalContext.current)
+    var user = userRepository.getUserByEmail(userEmail!!)
 
     // Variáveis de estado para controlar
     // os valores exibidos nos OutlinedTextFields
     var name by remember {
-        mutableStateOf("")
+        mutableStateOf(user!!.name)
     }
     var email by remember {
-        mutableStateOf("")
+        mutableStateOf(user!!.email)
     }
     var password by remember {
-        mutableStateOf("")
+        mutableStateOf(user!!.password)
     }
 
     // Variáveis de estado para verificar se os dados estão corretos
@@ -253,9 +236,9 @@ fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
         return !isNameError && !isEmailError && !isPasswordError
     }
 
-    // Criar uma instância da classe SharedPreferencesUserRepository
-   // val userRepository: UserRepository = SharedPreferencesUserRepository(LocalContext.current)
-    val userRepository = RoomUserRepository(LocalContext.current)
+    var showDeleteDialog by remember {
+        mutableStateOf(false)
+    }
 
     Column(
         modifier = Modifier
@@ -294,8 +277,8 @@ fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
                 imeAction = ImeAction.Next
             ),
 
-        isError = isNameError,
-        trailingIcon = {
+            isError = isNameError,
+            trailingIcon = {
                 if (isNameError){
                     Icon(
                         imageVector = Icons.Default.Error,
@@ -303,7 +286,7 @@ fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
                         tint = MaterialTheme.colorScheme.error
                     )
                 }
-        },
+            },
             supportingText = {
                 if (isNameError){
                     Text (
@@ -363,7 +346,11 @@ fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
                         textAlign = TextAlign.End
                     )
                 }
-            }
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            )
         )
         // Caixa de texto your password
         OutlinedTextField(
@@ -410,44 +397,97 @@ fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
                         textAlign = TextAlign.End
                     )
                 }
-            },
-
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.NumberPassword,
-                imeAction = ImeAction.Done
-            )
+            }
         )
         // Botão Create account
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
                 if(validate()){
                     userRepository
-                    .saveUser(
-                        User(
-                            name = name,
-                            email = email,
-                            password = password,
-                            userImage = convertBitmapToByteArray(profileImage)
+                        .update(
+                            User(
+                                id = user!!.id,
+                                name = name,
+                                email = email,
+                                password = password,
+                                userImage = convertBitmapToByteArray
+                                    (profileImage)
+                            )
                         )
-                    )
                     showDialogSuccess = true
-            }
+                }
                 else{
                     showDialogError = true
                 }
-    },
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
             shape = RoundedCornerShape(8.dp)
         ) {
             Text(
-                text = stringResource(R.string.create_account),
+                text = stringResource(R.string.update_profile),
                 style = MaterialTheme.typography.labelMedium
             )
         }
+
+
+        // Botão Delete profile
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = {
+                showDeleteDialog = true
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.tertiary
+            )
+        ) {
+            Text(
+                text = "Delete profile",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onTertiary
+            )
+        }
     }
+
+    // Caixa de diálogo para exclusão
+
+    if (showDeleteDialog != false){
+        AlertDialog(
+            onDismissRequest = {showDeleteDialog = false},
+            title = {
+                Text(text = stringResource(R.string.delete_user))
+            },
+            text = {
+                Text(text = stringResource(R.string.sure_delete_account))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                       showDeleteDialog = false
+                        if (user != null){
+                            userRepository.delete(user)
+                            navController.navigate(Destination.LoginScreen.route)
+                        }
+                    }) {
+                    Text(text = stringResource(R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showDeleteDialog = false
+                }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
     // Caixa de diálogo de sucesso
     if (showDialogSuccess){
         AlertDialog(
@@ -456,16 +496,16 @@ fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
                 Text(text = "Success")
             },
             text = {
-                Text(text = "Account created successfully")
+                Text(text = stringResource(R.string.account_updated_successfully))
             },
             confirmButton = {
-                    TextButton(
-                        onClick = {
-                            navController.navigate(Destination.LoginScreen.route)
-                        }
-                    ) {
-                        Text(text = "Ok")
+                TextButton(
+                    onClick = {
+                        navController.navigate(Destination.LoginScreen.route)
                     }
+                ) {
+                    Text(text = "Ok")
+                }
             }
         )
     }
@@ -478,7 +518,7 @@ fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
                 Text (text = "Error")
             },
             text = {
-            Text (text = "Please fill in all fields correctly")
+                Text (text = "Please fill in all fields correctly")
             },
             confirmButton = {
                 TextButton(
@@ -492,13 +532,4 @@ fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
         )
     }
 
-}
-@Preview(
-    showBackground = true
-)
-@Composable
-private fun SignupUserFormPreview() {
-    RecipesFoodTheme {
-       // SignupUserForm(rememberNavController(), profileImage)
-    }
 }

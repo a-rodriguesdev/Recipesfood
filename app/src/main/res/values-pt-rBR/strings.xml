@@ -27,4 +27,12 @@
     <string name="search_by_recipes">Search by recipes</string>
     <string name="categories">Categories</string>
     <string name="password_icon">Password icon</string>
+    <string name="profile">Profile</string>
+    <string name="user_profile_details">User profile details</string>
+    <string name="update_profile">Update profile</string>
+    <string name="account_updated_successfully">Account updated successfully</string>
+    <string name="delete_user">Delete user</string>
+    <string name="sure_delete_account">Are you sure you want to delete your account?</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
 </resources>

@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -41,10 +42,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import br.com.fiap.recipesfood.R
 import br.com.fiap.recipesfood.navigation.Destination
+import br.com.fiap.recipesfood.repository.RoomUserRepository
+import br.com.fiap.recipesfood.repository.SharedPreferencesUserRepository
+import br.com.fiap.recipesfood.repository.UserRepository
 import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -125,6 +129,16 @@ fun LoginForm(navController: NavController) {
     var password by remember {
         mutableStateOf("")
     }
+    var showPassword by remember {
+        mutableStateOf(false)
+    }
+    var authenticateError by remember {
+        mutableStateOf(false)
+    }
+
+    // Criar uma instância de classe SharedPreferencesUserRepository
+    val userRepository: UserRepository =
+        RoomUserRepository(LocalContext.current)
 
     Column() {
     OutlinedTextField(

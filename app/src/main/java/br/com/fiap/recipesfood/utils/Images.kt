@@ -14,7 +14,7 @@ fun convertBitmapToByteArray(bitmap: Bitmap): ByteArray{
     return outputStream.toByteArray()
 }
 
-fun convertByteArrayToBytemap(imageArray: ByteArray): Bitmap{
+fun convertByteArrayToBitmap(imageArray: ByteArray): Bitmap{
     return BitmapFactory
         .decodeByteArray(
             imageArray,

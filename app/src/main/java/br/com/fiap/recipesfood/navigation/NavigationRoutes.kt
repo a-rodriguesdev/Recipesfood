@@ -12,6 +12,7 @@ import br.com.fiap.recipesfood.ui.theme.screens.CategoryRecipeScreen
 import br.com.fiap.recipesfood.ui.theme.screens.HomeScreen
 import br.com.fiap.recipesfood.ui.theme.screens.InitialScreen
 import br.com.fiap.recipesfood.ui.theme.screens.LoginScreen
+import br.com.fiap.recipesfood.ui.theme.screens.ProfileScreen
 import br.com.fiap.recipesfood.ui.theme.screens.SignupScreen
 
 @Composable
@@ -33,17 +34,36 @@ fun NavigationRoutes(){
                     action = Intent.ACTION_VIEW
                 }
             ),
-            arguments = listOf(navArgument("email"){
-                type = NavType.StringType
-            })
+            arguments = listOf(
+                navArgument("email") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
             ) {backStackEntry ->
-            var email = backStackEntry.arguments?.getString("email")
+            val email = backStackEntry.arguments?.getString("email").orEmpty()
             HomeScreen(navController, email)
 
         }
-        composable(Destination.SignupScreen.route) {
+        composable(
+            Destination.ProfileScreen.route) {
             SignupScreen(navController)
         }
+
+
+        composable(
+            route = Destination.ProfileScreen.route,
+            arguments = listOf(
+                navArgument(name = "email"){
+                    type = NavType.StringType
+                }
+            )
+        ) {backStackEntry ->
+            var email = backStackEntry.arguments?.getString("email")
+            ProfileScreen(navController, email)
+        }
+
+
         composable(Destination.LoginScreen.route) {
             LoginScreen(navController)
         }

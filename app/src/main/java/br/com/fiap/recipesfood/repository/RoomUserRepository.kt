@@ -29,4 +29,12 @@ class RoomUserRepository(context: Context): UserRepository {
         val user = recipeFoodDatabase.login(email, password)
         return user != null
     }
+
+    override fun update(user: User): Int {
+        return recipeFoodDatabase.update(user)
+    }
+
+    override fun delete(user: User): Int {
+        return recipeFoodDatabase.update(user)
+    }
 }

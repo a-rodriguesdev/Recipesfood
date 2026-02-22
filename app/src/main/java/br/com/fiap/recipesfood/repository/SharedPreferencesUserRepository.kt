@@ -47,7 +47,30 @@ class SharedPreferencesUserRepository(context: Context) : UserRepository {
         return email == emailPrefs && password == passwordPrefs
     }
 
-    override fun getUserByEmail(email: String): User {
+    override fun update(user: User): Int {
         TODO("Not yet implemented")
+    }
+
+    override fun delete(user: User): Int {
+        val emailPrefs = userPrefs.getString("email", "").orEmpty()
+        if (emailPrefs.isBlank()) return 0
+
+        userPrefs.edit()
+            .remove("id")
+            .remove("name")
+            .remove("email")
+            .remove("password")
+            .apply()
+
+        return 1
+    }
+
+    override fun getUserByEmail(email: String): User? {
+        val emailPrefs = userPrefs.getString("email", "") ?: ""
+        return if (email.equals(emailPrefs, ignoreCase = true)) {
+            getUser()
+        } else {
+            null
+        }
     }
 }

@@ -1,5 +1,6 @@
 package br.com.fiap.recipesfood.ui.theme.screens
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -39,11 +40,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -58,10 +65,12 @@ import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
 import br.com.fiap.recipesfood.R
 import br.com.fiap.recipesfood.components.CategoryItem
 import br.com.fiap.recipesfood.components.RecipeItem
-import br.com.fiap.recipesfood.model.Category
 import br.com.fiap.recipesfood.navigation.Destination
+import br.com.fiap.recipesfood.repository.RoomUserRepository
+import br.com.fiap.recipesfood.repository.UserRepository
 import br.com.fiap.recipesfood.repository.getAllCategories
 import br.com.fiap.recipesfood.repository.getAllRecipes
+import br.com.fiap.recipesfood.utils.convertByteArrayToBitmap
 
 @Composable
 fun HomeScreen(navController: NavController, email: String?) {
@@ -70,7 +79,7 @@ fun HomeScreen(navController: NavController, email: String?) {
             .fillMaxSize()
     ) {
         Scaffold(
-            topBar = { MyTopAppBar(email!!)},
+            topBar = { MyTopAppBar(email.orEmpty(),navController)},
             bottomBar = {MyBottomAppBar()},
             floatingActionButton = {
                 FloatingActionButton(
@@ -103,7 +112,19 @@ private fun HomeScreenPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyTopAppBar(email: String) {
+fun MyTopAppBar(email: String = "", rememberNavController: NavController,) {
+
+    val userRepository: UserRepository =
+        RoomUserRepository(LocalContext.current)
+
+    val user = userRepository.getUserByEmail(email)
+
+    var profileBitmap by remember {
+        mutableStateOf<Bitmap>(
+            convertByteArrayToBitmap(user!!.userImage!!)
+        )
+    }
+
     TopAppBar(
         modifier = Modifier
             .fillMaxWidth(),
@@ -118,7 +139,7 @@ fun MyTopAppBar(email: String) {
             ) {
                 Column() {
                     Text(
-                        text = "Hello, Évelyn!",
+                        text = "Hello, ${user!!.name}",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
@@ -142,8 +163,10 @@ fun MyTopAppBar(email: String) {
                     )
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.userhome),
-                        contentDescription = "User Image"
+                        bitmap = profileBitmap.asImageBitmap(),
+                        modifier = Modifier.fillMaxSize(),
+                        contentDescription = "User Image",
+                        contentScale = ContentScale.Crop
                     )
                 }
             }
@@ -155,7 +178,7 @@ fun MyTopAppBar(email: String) {
 @Composable
 private fun MyTopAppBarPreview() {
     RecipesFoodTheme {
-        MyTopAppBar("")
+        MyTopAppBar("", rememberNavController())
     }
 }
 
