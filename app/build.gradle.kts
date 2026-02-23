@@ -56,6 +56,12 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore.ktx)
 
+    // Retrofit dependencie
+    implementation("com.google.code.gson:gson:2.10.1")
+    // Coil dependence
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
     // Navigation Compose dependence
     implementation(libs.androidx.navigation.compose)
 
