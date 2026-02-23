@@ -1,4 +1,4 @@
-# RecipesFood 🍽️  
+# RecipesFood 🍽️
 Mobile App de Receitas — FIAP | Fase 1 – 2º Ano
 
 Aplicativo Android desenvolvido progressivamente ao longo dos capítulos da Fase 1 do 2º ano do curso de Análise e Desenvolvimento de Sistemas (FIAP).
@@ -112,5 +112,5 @@ Organização de DI (Dependency Injection)
 
 ### 👩‍💻 Desenvolvido por
 
-Évelyn Rodrigues - 
+Évelyn Rodrigues -
 FIAP – Análise e Desenvolvimento de Sistemas
