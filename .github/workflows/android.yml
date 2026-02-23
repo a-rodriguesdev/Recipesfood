@@ -1,39 +1,27 @@
+name: Android CI
 
----
+on:
+  push:
+    branches: ["master", "main"]
+  pull_request:
+    branches: ["master", "main"]
+  workflow_dispatch:
 
-## 🚀 Status do projeto
-🟡 Em desenvolvimento  
-Projeto acadêmico em constante evolução com novas funcionalidades sendo implementadas.
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-Próximas melhorias planejadas:
-- Integração com banco de dados
-- Cadastro de receitas
-- Favoritos
-- Perfil de usuário
-- API externa de receitas
-- Persistência de dados
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: gradle
 
----
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
 
-## 📚 Aprendizados aplicados
-Este projeto reforça conhecimentos em:
-
-- Desenvolvimento Android moderno
-- Kotlin na prática
-- Jetpack Compose
-- Navegação entre telas
-- Organização de projetos mobile
-- Versionamento com Git/GitHub
-- Boas práticas de UI/UX
-
----
-
-## 👩‍💻 Desenvolvido por
-**Évelyn Rodrigues**  
-Estudante de Análise e Desenvolvimento de Sistemas — FIAP  
-Foco em Mobile Development, Front-End e Cybersecurity
-
----
-
-## 📎 Observação
-Este projeto é acadêmico e faz parte da construção de portfólio profissional na área de tecnologia, demonstrando evolução prática em desenvolvimento mobile Android.
+      - name: Build Debug
+        run: ./gradlew assembleDebug --stacktrace
