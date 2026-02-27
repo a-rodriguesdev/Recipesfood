@@ -243,6 +243,7 @@ fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
     // Variável de estado para controlar a exibição da mensagem de erro
     var showDialogError by remember { mutableStateOf(false) }
     var showDialogSuccess by remember { mutableStateOf(false) }
+    var showDialogEmailExists by remember { mutableStateOf(false) }
 
 
     // Função para verificar se os dados estão corretos
@@ -421,22 +422,29 @@ fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
         Spacer(modifier = Modifier.height(32.dp))
         Button(
             onClick = {
-                if(validate()){
-                    userRepository
-                    .saveUser(
-                        User(
-                            name = name,
-                            email = email,
-                            password = password,
-                            userImage = convertBitmapToByteArray(profileImage)
+                if (validate()) {
+
+                    val existingUser = userRepository.getUserByEmail(email)
+
+                    if (existingUser != null) {
+                        // email já existe -> não salva, só avisa
+                        showDialogEmailExists = true
+                    } else {
+                        userRepository.saveUser(
+                            User(
+                                name = name,
+                                email = email,
+                                password = password,
+                                userImage = convertBitmapToByteArray(profileImage)
+                            )
                         )
-                    )
-                    showDialogSuccess = true
-            }
-                else{
+                        showDialogSuccess = true
+                    }
+
+                } else {
                     showDialogError = true
                 }
-    },
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -451,7 +459,7 @@ fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
     // Caixa de diálogo de sucesso
     if (showDialogSuccess){
         AlertDialog(
-            onDismissRequest = {showDialogError = false},
+            onDismissRequest = { showDialogSuccess = false },
             title = {
                 Text(text = "Success")
             },
@@ -485,6 +493,20 @@ fun SignupUserForm(navController: NavController, profileImage: Bitmap) {
                     onClick = {
                         showDialogError = false
                     }
+                ) {
+                    Text(text = "Ok")
+                }
+            }
+        )
+    }
+    if (showDialogEmailExists) {
+        AlertDialog(
+            onDismissRequest = { showDialogEmailExists = false },
+            title = { Text(text = "E-mail já cadastrado") },
+            text = { Text(text = "Esse e-mail já possui conta. Faça login ou use outro e-mail.") },
+            confirmButton = {
+                TextButton(
+                    onClick = { showDialogEmailExists = false }
                 ) {
                     Text(text = "Ok")
                 }

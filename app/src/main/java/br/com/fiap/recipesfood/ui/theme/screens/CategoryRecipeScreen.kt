@@ -1,6 +1,5 @@
 package br.com.fiap.recipesfood.ui.theme.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,17 +34,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.fiap.recipesfood.R
+import br.com.fiap.recipesfood.factory.RetrofitClient
 import br.com.fiap.recipesfood.model.Recipe
-import br.com.fiap.recipesfood.repository.getAllRecipes
-import br.com.fiap.recipesfood.repository.getCategoryById
+import br.com.fiap.recipesfood.repository.getLatestRecipes
 import br.com.fiap.recipesfood.repository.getRecipesByCategory
 import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
+import coil.compose.AsyncImage
 
 @Composable
 fun CategoryRecipeScreen(categoryId: Int?) {
@@ -62,11 +61,10 @@ fun CategoryRecipeScreen(categoryId: Int?) {
 
 
     // Se não houverem receitas para a categoria selecionada, devemos obter o nome da categoria
-
     // através da função getCategoryById()
     when(recipesByCategory.size){
         0 -> {
-            categoryName = getCategoryById(categoryId)!!.name
+            categoryName = ""  //getCategoryById(categoryId)!!.name
         }
         else -> {
             categoryName = recipesByCategory[0].category.name
@@ -182,6 +180,9 @@ fun CategoryRecipeScreen(categoryId: Int?) {
 
 @Composable
 fun CategoryRecipe(recipe: Recipe) {
+
+    val baseUrl = RetrofitClient.BASE_URL.plus("recipes")
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -196,8 +197,8 @@ fun CategoryRecipe(recipe: Recipe) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Image(
-                painter = painterResource(recipe.image!!),
+            AsyncImage(
+                model = baseUrl.plus(recipe.image),
                 contentDescription = "",
                 modifier = Modifier.weight(1f),
                 contentScale = ContentScale.Crop
@@ -271,7 +272,7 @@ fun CategoryRecipe(recipe: Recipe) {
 @Composable
 private fun CategoryRecipePreview() {
     RecipesFoodTheme {
-        CategoryRecipe(getAllRecipes()[0])
+        CategoryRecipe(getLatestRecipes()[0])
     }
 }
 

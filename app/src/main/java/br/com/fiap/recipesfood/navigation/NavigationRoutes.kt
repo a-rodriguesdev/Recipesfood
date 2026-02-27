@@ -45,8 +45,7 @@ fun NavigationRoutes(){
             HomeScreen(navController, email)
 
         }
-        composable(
-            Destination.ProfileScreen.route) {
+        composable(Destination.SignupScreen.route) {
             SignupScreen(navController)
         }
 

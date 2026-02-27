@@ -1,6 +1,5 @@
 package br.com.fiap.recipesfood.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,15 +23,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import br.com.fiap.recipesfood.factory.RetrofitClient
 import br.com.fiap.recipesfood.model.Recipe
-import br.com.fiap.recipesfood.repository.getAllRecipes
+import br.com.fiap.recipesfood.repository.getLatestRecipes
 import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
+import coil.compose.AsyncImage
 
 @Composable
 fun RecipeItem(recipe: Recipe) {
+
+    val serverBaseUrl = RetrofitClient.BASE_URL.removeSuffix("api/")
 
     Card(
         modifier = Modifier
@@ -43,9 +45,17 @@ fun RecipeItem(recipe: Recipe) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Image(
-                painter = painterResource(recipe.image!!),
-                contentDescription = "",
+            val imagePath = if (recipe.image.isNotBlank()) recipe.image else recipe.category.image
+
+            val imageUrl = when {
+                imagePath.startsWith("http") -> imagePath
+                imagePath.startsWith("/") -> serverBaseUrl.dropLast(1) + imagePath
+                else -> serverBaseUrl + imagePath
+            }
+
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = recipe.name,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
@@ -62,7 +72,7 @@ fun RecipeItem(recipe: Recipe) {
                     )
             ) {
                 Text(
-                    text = recipe.user.name,
+                    text = "Nome do usuário",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(top = 8.dp, start = 8.dp)
@@ -114,6 +124,6 @@ fun RecipeItem(recipe: Recipe) {
 @Composable
 private fun RecipeItemPreview() {
     RecipesFoodTheme {
-        RecipeItem(getAllRecipes()[1])
+        RecipeItem(getLatestRecipes()[1])
     }
 }

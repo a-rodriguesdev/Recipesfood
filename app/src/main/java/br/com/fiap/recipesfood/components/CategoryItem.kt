@@ -15,9 +15,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,12 +27,11 @@ import br.com.fiap.recipesfood.factory.RetrofitClient
 import br.com.fiap.recipesfood.model.Category
 import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
 import coil.compose.AsyncImage
-import org.jetbrains.annotations.Async
 
 @Composable
 fun CategoryItem(
-    category: Category = Category(),
-    onClick: () -> Unit
+    category: Category,
+    onClick: () -> Unit = {}
 ) {
 
     val baseUrl = RetrofitClient.BASE_URL.plus("recipes")
@@ -39,14 +40,12 @@ fun CategoryItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .width(90.dp)
-            .clickable(
-                onClick = {}
-            )
+            .clickable(onClick = onClick)
     ) {
         Card(
             modifier = Modifier
                 .padding(bottom = 4.dp)
-                .size(90.dp)
+                .size(96.dp)
                 .border(
                     width = 2.dp,
                     color = MaterialTheme.colorScheme.primary,
@@ -54,7 +53,7 @@ fun CategoryItem(
                 ),
             shape = CircleShape,
             colors = CardDefaults.cardColors(
-                containerColor = Color(category.background.toLong(16))
+                containerColor = Color.White
             )
         ) {
             Box(
@@ -62,11 +61,29 @@ fun CategoryItem(
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ){
-                AsyncImage(
-                    model = baseUrl.plus(category.image),
-                    contentDescription = category.name,
-                    modifier = Modifier.size(45.dp)
-                )
+                val context = LocalContext.current
+
+                val imageResId = remember(category.name) {
+                    val fileName = category.name.lowercase()
+                    context.resources.getIdentifier(
+                        fileName, "drawable", context
+                            .packageName)
+                }
+
+                if (imageResId != 0) {
+                    Image(
+                        painter = painterResource(id = imageResId),
+                        contentDescription = category.name,
+                        modifier = Modifier.size(75.dp)
+                    )
+                } else {
+                    // fallback: usa imagem da API (professor)
+                    AsyncImage(
+                        model = category.image, // url da API
+                        contentDescription = category.name,
+                        modifier = Modifier.size(65.dp)
+                    )
+                }
 
 //                Image(
 //                    painter = painterResource(category.image!!),
@@ -88,6 +105,13 @@ fun CategoryItem(
 @Composable
 private fun CategoryItemPreview() {
     RecipesFoodTheme {
-        CategoryItem(onClick = {})
+        CategoryItem(
+            category = Category(
+                id = 1,
+                name = "Chicken",
+                image = "chicken",
+                background = "FFFFFFFF"
+            )
+        )
     }
 }

@@ -1,6 +1,6 @@
 package br.com.fiap.recipesfood.ui.theme.screens
 
-import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -40,17 +40,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -59,18 +55,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
 import br.com.fiap.recipesfood.R
 import br.com.fiap.recipesfood.components.CategoryItem
 import br.com.fiap.recipesfood.components.RecipeItem
 import br.com.fiap.recipesfood.navigation.Destination
+import br.com.fiap.recipesfood.repository.getAllCategories
+import br.com.fiap.recipesfood.repository.getLatestRecipes
+import br.com.fiap.recipesfood.utils.convertByteArrayToBitmap
+import androidx.compose.ui.platform.LocalContext
 import br.com.fiap.recipesfood.repository.RoomUserRepository
 import br.com.fiap.recipesfood.repository.UserRepository
-import br.com.fiap.recipesfood.repository.getAllCategories
-import br.com.fiap.recipesfood.repository.getAllRecipes
-import br.com.fiap.recipesfood.utils.convertByteArrayToBitmap
+import android.graphics.Bitmap
 
 @Composable
 fun HomeScreen(navController: NavController, email: String?) {
@@ -112,23 +109,25 @@ private fun HomeScreenPreview() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyTopAppBar(email: String = "", rememberNavController: NavController,) {
+fun MyTopAppBar(email: String = "", rememberNavController: NavController) {
+
+    val context = LocalContext.current
 
     val userRepository: UserRepository =
-        RoomUserRepository(LocalContext.current)
+        RoomUserRepository(context)
 
     val user = userRepository.getUserByEmail(email)
 
-    var profileBitmap by remember {
-        mutableStateOf<Bitmap>(
-            convertByteArrayToBitmap(user!!.userImage!!)
-        )
+    val placeHolderBitmap: Bitmap = remember {
+        BitmapFactory.decodeResource(context.resources, R.drawable.user)
+    }
+
+    val profileBitmap: Bitmap = remember(user?.userImage) {
+        user?.userImage?.let { convertByteArrayToBitmap(it) } ?: placeHolderBitmap
     }
 
     TopAppBar(
-        modifier = Modifier
-            .fillMaxWidth(),
-            //.height(60.dp),
+        modifier = Modifier.fillMaxWidth(),
         title = {
             Row(
                 modifier = Modifier
@@ -137,9 +136,9 @@ fun MyTopAppBar(email: String = "", rememberNavController: NavController,) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column() {
+                Column {
                     Text(
-                        text = "Hello, ${user!!.name}",
+                        text = "Hello, ${user?.name ?: "Guest"}",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
@@ -149,14 +148,11 @@ fun MyTopAppBar(email: String = "", rememberNavController: NavController,) {
                         style = MaterialTheme.typography.displaySmall
                     )
                 }
+
                 Card(
-                    modifier = Modifier
-                        .size(48.dp),
+                    modifier = Modifier.size(48.dp),
                     shape = CircleShape,
-                    colors = CardDefaults
-                        .cardColors(
-                            containerColor = Color.Transparent
-                        ),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     border = BorderStroke(
                         width = 1.dp,
                         color = MaterialTheme.colorScheme.primary
@@ -243,7 +239,7 @@ fun ContentScreen(
 
     // Variável que vai armazenar a lista de receitas
 
-    val recipes = getAllRecipes()
+    val latestRecipes = getLatestRecipes()
 
     Column(
         modifier = modifier
@@ -336,7 +332,7 @@ fun ContentScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(recipes){recipe ->
+            items(latestRecipes){ recipe ->
                 RecipeItem(recipe)
 
             }

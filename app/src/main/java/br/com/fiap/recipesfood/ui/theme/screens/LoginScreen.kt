@@ -1,5 +1,7 @@
 package br.com.fiap.recipesfood.ui.theme.screens
 
+import android.net.Uri
+import androidx.compose.material3.AlertDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -213,12 +215,16 @@ fun LoginForm(navController: NavController) {
     Spacer(modifier= Modifier.height(32.dp))
     Button(
         onClick = {
-            navController
-                .navigate(
-                    Destination
-                        .HomeScreen
-                        .createRoute(email)
+            val isValid = userRepository.login(email, password)
+
+            if (isValid) {
+                authenticateError = false
+                navController.navigate(
+                    Destination.HomeScreen.createRoute(Uri.encode(email))
                 )
+            } else {
+                authenticateError = true
+            }
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -231,6 +237,20 @@ fun LoginForm(navController: NavController) {
         )
     }
     Spacer(modifier= Modifier.height(16.dp))
+
+        if (authenticateError) {
+            AlertDialog(
+                onDismissRequest = { authenticateError = false },
+                confirmButton = {
+                    TextButton(onClick = { authenticateError = false }) {
+                        Text("OK")
+                    }
+                },
+                title = { Text("Falha no login") },
+                text = { Text("E-mail ou senha inválidos.") }
+            )
+        }
+
     Row(
         modifier = Modifier
             .fillMaxWidth(),
