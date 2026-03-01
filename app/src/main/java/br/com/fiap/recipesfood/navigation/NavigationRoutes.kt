@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import br.com.fiap.recipesfood.ui.theme.screens.AddRecipeScreen
 import br.com.fiap.recipesfood.ui.theme.screens.CategoryRecipeScreen
 import br.com.fiap.recipesfood.ui.theme.screens.HomeScreen
 import br.com.fiap.recipesfood.ui.theme.screens.InitialScreen
@@ -78,5 +79,9 @@ fun NavigationRoutes(){
             val categoryId = it.arguments?.getInt("categoryId")
             CategoryRecipeScreen(categoryId)
         }
+
+        composable(Destination.AddRecipeScreen.route){
+            AddRecipeScreen((navController)
+        ) }
     }
 }
