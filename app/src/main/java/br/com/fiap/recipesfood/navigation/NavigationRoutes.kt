@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import br.com.fiap.recipesfood.ui.theme.screens.AddRecipeIngredientsScreen
 import br.com.fiap.recipesfood.ui.theme.screens.AddRecipeScreen
 import br.com.fiap.recipesfood.ui.theme.screens.CategoryRecipeScreen
 import br.com.fiap.recipesfood.ui.theme.screens.HomeScreen
@@ -68,20 +69,40 @@ fun NavigationRoutes(){
             LoginScreen(navController)
         }
         composable(
-
             route = Destination.CategoryRecipeScreen.route,
             arguments = listOf(
-                navArgument(name = "categoryId"){
+                navArgument(name = "id") {
                     type = NavType.IntType
                 }
             )
-        ) {
-            val categoryId = it.arguments?.getInt("categoryId")
-            CategoryRecipeScreen(categoryId)
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id")
+            CategoryRecipeScreen(id)
         }
 
         composable(Destination.AddRecipeScreen.route){
             AddRecipeScreen((navController)
         ) }
+
+// Adicionar tela de adição de ingredientes no sistema de navegação.
+        composable(
+            route = Destination.AddRecipeIngredientsScreen.route,
+            arguments = listOf(
+                navArgument(
+                    name = "recipeId"
+                ) { type = NavType.IntType },
+                navArgument(
+                    name = "recipeName"
+                ) { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            var recipeId = backStackEntry.arguments?.getInt("recipeId")
+            var recipeName = backStackEntry.arguments?.getString("recipeName")
+            AddRecipeIngredientsScreen(
+                navController,
+                recipeId,
+                recipeName
+            )
+        }
     }
 }

@@ -20,21 +20,21 @@ fun getAllCategories(): List<Category> {
 
     val callCategories = RetrofitClient.getCategoryService().getAllCategories()
 
-    callCategories.enqueue(object: Callback<List<Category>>{
+    callCategories.enqueue(object : Callback<List<Category>> {
         override fun onResponse(
-            call: Call<List<Category>?>,
-            response: Response<List<Category>?>
+            call: Call<List<Category>>,
+            response: Response<List<Category>>
         ) {
-            categories = response.body()!!
+            categories = response.body() ?: emptyList()
         }
 
         override fun onFailure(
-            p0: Call<List<Category>?>,
-            p1: Throwable
+            call: Call<List<Category>>,
+            t: Throwable
         ) {
-            println(p1.printStackTrace())
+            println(t.message)
+            t.printStackTrace()
         }
-
     })
 
     return categories

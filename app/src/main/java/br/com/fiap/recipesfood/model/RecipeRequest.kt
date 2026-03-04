@@ -1,6 +1,7 @@
 package br.com.fiap.recipesfood.model
 
 data class RecipeRequest(
+    val id: Int? = null,
     val title: String = "",
     val difficultLevel: DifficultLevel = DifficultLevel.BEGINNER,
     val description: String = "",

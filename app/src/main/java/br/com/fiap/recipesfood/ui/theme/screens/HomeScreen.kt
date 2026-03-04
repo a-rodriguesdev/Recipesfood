@@ -315,7 +315,7 @@ fun ContentScreen(
                     navController.navigate(
                         route = Destination
                             .CategoryRecipeScreen
-                            .createRoute(categoryId = category.id)
+                            .createRoute(id = category.id)
                     )
                 })
             }

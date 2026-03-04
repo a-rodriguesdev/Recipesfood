@@ -84,18 +84,18 @@ fun getRecipesByCategory(id: Int): List<Recipe> {
 
     callRecipesByCategory.enqueue(object : Callback<List<Recipe>> {
         override fun onResponse(
-            p0: Call<List<Recipe>?>,
-            response: Response<List<Recipe>?>
+            call: Call<List<Recipe>>,
+            response: Response<List<Recipe>>
         ) {
             recipes = response.body() ?: emptyList()
         }
 
         override fun onFailure(
-            p0: Call<List<Recipe>?>,
-            p1: Throwable
-        ){
-            println("ERRO-----> ${p1.printStackTrace()}")
-            println(p1.message)
+            call: Call<List<Recipe>>,
+            t: Throwable
+        ) {
+            println(t.message)
+            t.printStackTrace()
         }
     })
     return recipes
@@ -128,27 +128,9 @@ fun getLatestRecipes(): List<Recipe>{
     return latestRecipes
 }
 
-fun saveRecipe(recipeRequest: RecipeRequest): RecipeRequest? {
-    var newRecipe: RecipeRequest? = RecipeRequest()
-    val callNewRecipe = RetrofitClient.getRecipeService()
-        .saveRecipe(recipeRequest)
+suspend fun saveRecipe(recipeRequest: RecipeRequest): RecipeRequest {
 
-    callNewRecipe.enqueue(object : Callback<RecipeRequest>{
-        override fun onResponse(
-            p0: Call<RecipeRequest?>,
-            response: Response<RecipeRequest?>
-        ){
-            newRecipe = response.body() ?: null
-        }
-
-        override fun onFailure(
-            p0: Call<RecipeRequest?>,
-            p1: Throwable
-        ) {
-            println(p1.message)
-        }
-    })
-
+    val newRecipe = RetrofitClient.getRecipeService().saveRecipe(recipeRequest)
     return newRecipe
 }
 

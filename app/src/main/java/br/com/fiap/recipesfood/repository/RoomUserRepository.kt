@@ -5,36 +5,37 @@ import br.com.fiap.recipesfood.dao.RecipeDatabase
 import br.com.fiap.recipesfood.model.User
 
 
-class RoomUserRepository(context: Context): UserRepository {
+class RoomUserRepository(context: Context) : UserRepository {
 
-    private val recipeFoodDatabase = RecipeDatabase.getDatabase(context).userDao()
+    private val userDao = RecipeDatabase.getDatabase(context).userDao()
 
     override fun saveUser(user: User) {
-        recipeFoodDatabase.save(user)
+        userDao.save(user)
     }
 
     override fun getUser(): User {
-        TODO("Not yet implemented")
+
+        // retorna o usuário 1 se existir, senão um User vazio
+        return userDao.getUserById(1) ?: User()
     }
 
     override fun getUser(id: Int): User {
-        return recipeFoodDatabase.getUserById(id = 1) ?: User()
+        return userDao.getUserById(id) ?: User()
     }
 
     override fun getUserByEmail(email: String): User? {
-        return recipeFoodDatabase.getUserByEmail(email)
+        return userDao.getUserByEmail(email)
     }
 
     override fun login(email: String, password: String): Boolean {
-        val user = recipeFoodDatabase.login(email, password)
-        return user != null
+        return userDao.login(email, password) != null
     }
 
     override fun update(user: User): Int {
-        return recipeFoodDatabase.update(user)
+        return userDao.update(user)
     }
 
     override fun delete(user: User): Int {
-        return recipeFoodDatabase.update(user)
+        return userDao.delete(user)
     }
 }

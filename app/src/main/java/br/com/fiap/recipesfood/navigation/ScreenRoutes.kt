@@ -22,9 +22,24 @@ sealed class Destination(val route: String){
     }
     object LoginScreen: Destination("login")
 
-    object  CategoryRecipeScreen: Destination("category/{categoryId}"){
-        fun createRoute(categoryId: Int): String {
-            return "category/$categoryId"
+    object CategoryRecipeScreen : Destination(
+        route = "categoryRecipes/{Id}"
+    ) {
+        fun createRoute(id: Int): String {
+            return "categoryRecipes/$id"
+        }
+    }
+
+    // Rota para a tela de cadastro de ingredientes da receita
+// passando o id e nome da receita como argumentos da rota
+    object AddRecipeIngredientsScreen : Destination(
+        route = "addIngredients/{recipeId}/{recipeName}"
+    ) {
+        fun createRoute(
+            recipeId: Int,
+            recipeName: String
+        ): String {
+            return "addIngredients/$recipeId/$recipeName"
         }
     }
 }
