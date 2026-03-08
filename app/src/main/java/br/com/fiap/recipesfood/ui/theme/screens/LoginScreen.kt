@@ -1,5 +1,6 @@
 package br.com.fiap.recipesfood.ui.theme.screens
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.material3.AlertDialog
 import androidx.compose.foundation.background
@@ -18,8 +19,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.RemoveRedEye
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -37,6 +41,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -125,6 +131,8 @@ private fun LoginTitlePreview() {
 @Composable
 fun LoginForm(navController: NavController) {
 
+    val context = LocalContext.current
+
     var email by remember{
         mutableStateOf("")
     }
@@ -201,26 +209,50 @@ fun LoginForm(navController: NavController) {
             )
         },
         trailingIcon = {
+            val image = if (showPassword){
+                Icons.Default.Visibility
+            } else {
+                Icons.Default.VisibilityOff
+            }
+            IconButton(
+                onClick = {showPassword = !showPassword}
+            ) {
             Icon(
-                imageVector = Icons.Default.RemoveRedEye,
-                contentDescription = "Remove red eye Icon",
+                imageVector = image,
+                contentDescription = "",
                 tint = MaterialTheme.colorScheme.tertiary
             )
+          }
         },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.NumberPassword,
             imeAction = ImeAction.Done
-        )
+        ),
+        visualTransformation = if (showPassword){
+            VisualTransformation.None
+        } else {
+            PasswordVisualTransformation()
+        }
     )
     Spacer(modifier= Modifier.height(32.dp))
     Button(
         onClick = {
-            val isValid = userRepository.login(email, password)
+            val autenticate = userRepository.login(email, password)
 
-            if (isValid) {
-                authenticateError = false
-                navController.navigate(
-                    Destination.HomeScreen.createRoute(Uri.encode(email))
+            if (autenticate) {
+                // Gravar dados do usuário no SharedPreferences
+                val sharedPreferences = context
+                    .getSharedPreferences("user_data", Context.MODE_PRIVATE)
+                val emailState = null
+                sharedPreferences.edit()
+                    .putString("email", email)
+                    .apply()
+
+                // Navega para a tela Home
+                navController
+                    .navigate(
+                    Destination.HomeScreen
+                        .createRoute(email)
                 )
             } else {
                 authenticateError = true

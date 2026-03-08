@@ -1,6 +1,7 @@
 package br.com.fiap.recipesfood.ui.theme.screens
 
-import androidx.compose.runtime.mutableIntStateOf
+import br.com.fiap.recipesfood.model.PreparationMethod
+import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,62 +50,56 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import br.com.fiap.recipesfood.model.Ingredient
 import br.com.fiap.recipesfood.navigation.Destination
-import br.com.fiap.recipesfood.repository.saveRecipeIngredients
-import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
+import br.com.fiap.recipesfood.repository.savePreparationMethods
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddRecipeIngredientsScreen(
+fun AddPreparationMethodsScreen(
     navController: NavHostController?,
     recipeId: Int?,
     recipeName: String?
 ) {
 
-    var ingredients = remember {
-        mutableStateListOf<Ingredient>()
+    var methods = remember {
+        mutableStateListOf<PreparationMethod>()
     }
 
-    var ingredient by remember {
+    var method by remember {
         mutableStateOf("")
     }
 
-    var ingredientNumber by remember {
+    var methodNumber by remember {
         mutableIntStateOf(0)
     }
 
     // Criar o escopo de coroutine que será utilizado
-// para chamar a gravação dos ingredientes da receita
+    // para chamar a gravação dos métodos de preparo da receita
     val scope = rememberCoroutineScope()
 
-// Lista que receberá a lista de ingredientes retornados pela API
-    var newIngredients: List<Ingredient> by remember {
+    // Lista que receberá a lista de
+    // métodos de preparo retornados pela API
+    var newMethods: List<PreparationMethod> by remember {
         mutableStateOf(listOf())
     }
 
-// Função lambda para preparar e enviar
-// os dados para o servidor
-    val saveNewIngredients: () -> Unit = {
-        println("Gravando ingredientes...")
+    // Função lambda para preparar e enviar
+    // os dados para o servidor
+    val saveNewMethods: () -> Unit = {
+        println("Gravando modos de preparo...")
         scope.launch {
-            val ingredientsToSend = ingredients.map {
+            val methodsToSend = methods.map{
                 it.copy(id = null)
             }
-            newIngredients = saveRecipeIngredients(
+            newMethods = savePreparationMethods(
                 recipeId = recipeId!!,
-                ingredients = ingredientsToSend)
-
-            // Navegar para a tela de
-            // cadastro de modos de preparo
+                preparationMethods = methodsToSend
+            )
             navController!!.navigate(
-                Destination
-                    .AddPreparationMethodsScreen
-                    .createRoute(
-                        recipeId = recipeId,
-                        recipeName = recipeName.toString()
-                    )
+                Destination.AddRecipePhotoScreen.createRoute(
+                    recipeId = recipeId
+                )
             )
         }
     }
@@ -132,13 +128,13 @@ fun AddRecipeIngredientsScreen(
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Step 2...",
+                    text = "Step 3...",
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(
-                    text = "In this moment, list all delicious ingredients that you used in your recipe.",
-                    color = MaterialTheme.colorScheme.primary,
+                    text = "Now, let's add the cooking instructions. \nBe super detailed!",
+                            color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(
                         top = 2.dp,
@@ -161,15 +157,15 @@ fun AddRecipeIngredientsScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Ingredients list",
+                        text = "Preparation Method",
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
                 // Campo título da receita
                 OutlinedTextField(
-                    value = ingredient,
-                    onValueChange = { ingredient = it },
+                    value = method,
+                    onValueChange = { method = it },
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .fillMaxWidth(),
@@ -189,13 +185,13 @@ fun AddRecipeIngredientsScreen(
                         )
                     },
                     placeholder = {
-                        Text(text = "Describe the ingredient here")
+                        Text(text = "Instructions step here...")
                     },
                     trailingIcon = {
                         IconButton(
                             onClick = {
-                                ingredientNumber = ingredients.size + 1
-                                ingredients.add(Ingredient(ingredientNumber, ingredient))
+                                methodNumber = methods.size + 1
+                                methods.add(PreparationMethod(methodNumber, method))
                             }
                         ) {
                             Icon(
@@ -217,21 +213,21 @@ fun AddRecipeIngredientsScreen(
                     .weight(2f)
             ) {
                 LazyColumn {
-                    items(ingredients) { ingredient ->
-                        IngredientItem(
+                    items(methods) { method ->
+                        PreparationMethodItem(
                             onClick = {
-                                // Removemos o ingrediente da lista
-                                ingredients.remove(ingredient)
+                                // Removemos o método de preparo da lista
+                                methods.remove(method)
 
-                                // Atualizamos a ordem dos ingredientes
-                                val reorderedList = ingredients.mapIndexed { index, item ->
+                                // Atualizamos a ordem dos métodos de preparo
+                                val reorderedList = methods.mapIndexed { index, item ->
                                     item.copy(id = index + 1)
                                 }
-                                // Atualizamos a lista de ingredientes
-                                ingredients.clear()
-                                ingredients.addAll(reorderedList)
+                                // Atualizamos a lista de modos de preparo
+                                methods.clear()
+                                methods.addAll(reorderedList)
                             },
-                            ingredient
+                            method
                         )
                     }
                 }
@@ -242,10 +238,9 @@ fun AddRecipeIngredientsScreen(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth()
-                //.align(Alignment.BottomStart)
             ) {
                 TextButton(
-                    onClick = saveNewIngredients
+                    onClick = saveNewMethods
                 ) {
                     Text(
                         text = "NEXT",
@@ -265,12 +260,13 @@ fun AddRecipeIngredientsScreen(
 }
 
 @Composable
-fun IngredientItem(onClick: () -> Unit, ingredient: Ingredient) {
+fun PreparationMethodItem(
+    onClick: () -> Unit, preparationMethod: PreparationMethod
+) {
     Card(
         modifier = Modifier
             .padding(vertical = 4.dp)
             .fillMaxWidth(),
-        //.height(60.dp),
         colors = CardDefaults
             .cardColors(
                 containerColor = MaterialTheme
@@ -298,7 +294,7 @@ fun IngredientItem(onClick: () -> Unit, ingredient: Ingredient) {
                     )
             ) {
                 Text(
-                    text = ingredient.id.toString(),
+                    text = preparationMethod.id.toString(),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
@@ -306,7 +302,7 @@ fun IngredientItem(onClick: () -> Unit, ingredient: Ingredient) {
                 )
             }
             Text(
-                text = ingredient.description,
+                text = preparationMethod.description,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
@@ -314,11 +310,13 @@ fun IngredientItem(onClick: () -> Unit, ingredient: Ingredient) {
                     .weight(2f)
             )
             IconButton(
-                onClick = { onClick() }
+                onClick = {
+                    onClick()
+                }
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete ingredient",
+                    contentDescription = "Delete preparation method",
                     tint = MaterialTheme.colorScheme.tertiary,
                 )
             }
@@ -328,20 +326,20 @@ fun IngredientItem(onClick: () -> Unit, ingredient: Ingredient) {
 
 @Preview
 @Composable
-private fun IngredientItemPreview() {
+private fun PreparationMethodItemPreview() {
     RecipesFoodTheme {
-        IngredientItem(
+        PreparationMethodItem(
             onClick = {},
-            ingredient = Ingredient(22, "Teste de receita")
+            preparationMethod = PreparationMethod(22, "Teste")
         )
     }
 }
 
 @Preview
 @Composable
-private fun AddRecipeScreenPreview() {
+private fun AddPreparationMethodsScreenPreview() {
     RecipesFoodTheme {
-        AddRecipeIngredientsScreen(
+        AddPreparationMethodsScreen(
             navController = null,
             recipeId = 0,
             recipeName = "Recipe name")

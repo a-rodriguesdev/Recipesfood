@@ -9,12 +9,16 @@ import br.com.fiap.recipesfood.factory.RetrofitClient
 import br.com.fiap.recipesfood.model.Category
 import br.com.fiap.recipesfood.model.DifficultLevel
 import br.com.fiap.recipesfood.model.Ingredient
+import br.com.fiap.recipesfood.model.PreparationMethod
 import br.com.fiap.recipesfood.model.Recipe
 import br.com.fiap.recipesfood.model.RecipeRequest
 import br.com.fiap.recipesfood.model.User
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 import java.time.LocalDate
 
 fun getAllRecipes() = listOf(
@@ -148,6 +152,29 @@ suspend fun saveRecipeIngredients(
     return newIngredients
 }
 
+suspend fun savePreparationMethods(
+    recipeId: Int,
+    preparationMethods: List<PreparationMethod>
+): List<PreparationMethod> {
+    val newPreparationMethods = RetrofitClient
+        .getRecipeService()
+        .savePreparationMethods(
+            recipeId = recipeId,
+            preparationMethods = preparationMethods
+        )
+    return newPreparationMethods
+}
 
+suspend fun uploadImage(recipeId: Int, file: File){
+    val image = MultipartBody.Part
+        .createFormData(
+            name = "file",
+            filename = file.name,
+            body = file.asRequestBody()
+        )
+
+    RetrofitClient.getRecipeService().uploadImage(recipeId, image)
+
+}
 
 

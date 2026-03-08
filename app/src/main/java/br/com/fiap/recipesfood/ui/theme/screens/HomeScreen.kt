@@ -1,5 +1,6 @@
 package br.com.fiap.recipesfood.ui.theme.screens
 
+import android.content.Context
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -68,6 +69,8 @@ import androidx.compose.ui.platform.LocalContext
 import br.com.fiap.recipesfood.repository.RoomUserRepository
 import br.com.fiap.recipesfood.repository.UserRepository
 import android.graphics.Bitmap
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 
 @Composable
 fun HomeScreen(navController: NavController, email: String?) {
@@ -113,20 +116,25 @@ private fun HomeScreenPreview() {
 @Composable
 fun MyTopAppBar(email: String = "", rememberNavController: NavController) {
 
-    val context = LocalContext.current
-
+// Criar uma instância da classe SharedPreferencesUserRepository
     val userRepository: UserRepository =
-        RoomUserRepository(context)
+        RoomUserRepository(LocalContext.current)
 
-    val user = userRepository.getUserByEmail(email)
+    // Lendo o arquivo "user_data" no SharedPreferences
+    val sharedPreferences = LocalContext.current
+        .getSharedPreferences("user_data", Context.MODE_PRIVATE)
 
-    val placeHolderBitmap: Bitmap = remember {
-        BitmapFactory.decodeResource(context.resources, R.drawable.user)
-    }
+    // Ler o arquivo e obter o valor da chave "email"
+    val emailSharedPreferences = sharedPreferences.getString("email", "")
 
-    val profileBitmap: Bitmap = remember(user?.userImage) {
-        user?.userImage?.let { convertByteArrayToBitmap(it) } ?: placeHolderBitmap
-    }
+    val user = userRepository.getUserByEmail(emailSharedPreferences!!)
+
+
+    val profileBitmap by remember {
+        mutableStateOf<Bitmap>(
+         convertByteArrayToBitmap(user!!.userImage!!)
+    )
+}
 
     TopAppBar(
         modifier = Modifier.fillMaxWidth(),
