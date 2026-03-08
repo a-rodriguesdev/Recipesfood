@@ -341,7 +341,7 @@ fun AddRecipeScreen(navController: NavHostController?) {
                             modifier = Modifier
                                 .height(40.dp)
                                 .selectable(
-                                    selected = difficultLevel == difficultLevel,
+                                    selected = difficultLevel == level,
                                     onClick = { difficultLevel = level }
                                 )
                         ) {
@@ -407,7 +407,7 @@ fun AddRecipeScreen(navController: NavHostController?) {
                 .align(Alignment.BottomStart)
         ){
             TextButton(
-                onClick = { saveNewRecipe }
+                onClick = { saveNewRecipe() }
             ) {
                 Text(
                     text = "NEXT",

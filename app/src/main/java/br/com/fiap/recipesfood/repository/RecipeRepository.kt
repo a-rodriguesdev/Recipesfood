@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import br.com.fiap.recipesfood.factory.RetrofitClient
 import br.com.fiap.recipesfood.model.Category
 import br.com.fiap.recipesfood.model.DifficultLevel
+import br.com.fiap.recipesfood.model.Ingredient
 import br.com.fiap.recipesfood.model.Recipe
 import br.com.fiap.recipesfood.model.RecipeRequest
 import br.com.fiap.recipesfood.model.User
@@ -134,11 +135,19 @@ suspend fun saveRecipe(recipeRequest: RecipeRequest): RecipeRequest {
     return newRecipe
 }
 
+suspend fun saveRecipeIngredients(
+    recipeId: Int,
+    ingredients: List<Ingredient>
+): List<Ingredient> {
+    val newIngredients = RetrofitClient
+        .getRecipeService()
+        .saveRecipeIngredients(
+            recipeId = recipeId,
+            ingredients = ingredients
+        )
+    return newIngredients
+}
 
-//fun getRecipesByCategory(id: Int) = getAllRecipes()
-//    .filter { recipe ->
-//        recipe.category.id == id
-//    }
 
 
 

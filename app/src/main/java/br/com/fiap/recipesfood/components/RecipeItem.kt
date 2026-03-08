@@ -45,9 +45,14 @@ fun RecipeItem(recipe: Recipe) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            val imagePath = if (recipe.image.isNotBlank()) recipe.image else recipe.category.image
+            val imagePath = when {
+                !recipe.image.isNullOrBlank() -> recipe.image
+                !recipe.category.image.isNullOrBlank() -> recipe.category.image
+                else -> ""
+            }
 
             val imageUrl = when {
+                imagePath.isBlank() -> ""
                 imagePath.startsWith("http") -> imagePath
                 imagePath.startsWith("/") -> serverBaseUrl.dropLast(1) + imagePath
                 else -> serverBaseUrl + imagePath

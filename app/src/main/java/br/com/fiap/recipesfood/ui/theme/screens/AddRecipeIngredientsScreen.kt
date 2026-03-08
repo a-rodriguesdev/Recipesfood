@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +49,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import br.com.fiap.recipesfood.model.Ingredient
+import br.com.fiap.recipesfood.repository.saveRecipeIngredients
 import br.com.fiap.recipesfood.ui.theme.RecipesFoodTheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,6 +71,29 @@ fun AddRecipeIngredientsScreen(
 
     var ingredientNumber by remember {
         mutableIntStateOf(0)
+    }
+
+    // Criar o escopo de coroutine que será utilizado
+// para chamar a gravação dos ingredientes da receita
+    val scope = rememberCoroutineScope()
+
+// Lista que receberá a lista de ingredientes retornados pela API
+    var newIngredients: List<Ingredient> by remember {
+        mutableStateOf(listOf())
+    }
+
+// Função lambda para preparar e enviar
+// os dados para o servidor
+    val saveNewIngredients: () -> Unit = {
+        println("Gravando ingredientes...")
+        scope.launch {
+            val ingredientsToSend = ingredients.map{
+                it.copy(id=null)
+            }
+            newIngredients = saveRecipeIngredients(
+                recipeId = recipeId!!,
+                ingredients = ingredientsToSend)
+        }
     }
 
     Column(
@@ -181,7 +207,18 @@ fun AddRecipeIngredientsScreen(
                 LazyColumn {
                     items(ingredients) { ingredient ->
                         IngredientItem(
-                            onClick = {},
+                            onClick = {
+                                // Removemos o ingrediente da lista
+                                ingredients.remove(ingredient)
+
+                                // Atualizamos a ordem dos ingredientes
+                                val reorderedList = ingredients.mapIndexed { index, item ->
+                                    item.copy(id = index + 1)
+                                }
+                                // Atualizamos a lista de ingredientes
+                                ingredients.clear()
+                                ingredients.addAll(reorderedList)
+                            },
                             ingredient
                         )
                     }
@@ -196,7 +233,7 @@ fun AddRecipeIngredientsScreen(
                 //.align(Alignment.BottomStart)
             ) {
                 TextButton(
-                    onClick = {}
+                    onClick = saveNewIngredients
                 ) {
                     Text(
                         text = "NEXT",
@@ -265,7 +302,7 @@ fun IngredientItem(onClick: () -> Unit, ingredient: Ingredient) {
                     .weight(2f)
             )
             IconButton(
-                onClick = {}
+                onClick = { onClick() }
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,

@@ -1,5 +1,6 @@
 package br.com.fiap.recipesfood.service
 
+import br.com.fiap.recipesfood.model.Ingredient
 import br.com.fiap.recipesfood.model.Recipe
 import br.com.fiap.recipesfood.model.RecipeRequest
 import retrofit2.Call
@@ -22,5 +23,11 @@ interface RecipesService {
 
     @POST("recipes")
     suspend fun saveRecipe(@Body recipeRequest: RecipeRequest): RecipeRequest
+
+    @POST("recipes/{recipeId}/ingredients")
+    suspend fun saveRecipeIngredients(
+        @Path("recipeId") recipeId: Int,
+        @Body ingredients: List<Ingredient>
+        ): List<Ingredient>
 
 }
